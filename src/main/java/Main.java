@@ -15,18 +15,28 @@ public class Main {
 
         try (final var serverSocket = server.start(9999)) {
             while (true) {
-                try (
-                        final var socket = server.startSocket(serverSocket);
-                ) {
+                final var socket = server.startSocket(serverSocket);
+                {
+                    executor.execute(() -> {
 
+                        try {
                             server.processingConnection(socket, validPaths);
-                  } catch (IOException e) {
-                    throw new RuntimeException(e);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                    });
                 }
+
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            executor.shutdown();
         }
     }
 }
+
 
 
 
